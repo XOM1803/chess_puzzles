@@ -43,6 +43,13 @@ export const PUZZLES = [
     fen: 'r1bk2nr/p2p1pNp/n2B4/1p1NP2P/6P1/3P1Q2/P1P1K3/q5b1 w - - 1 22',
     moves: ['f3f6', 'g8f6', 'd6e7'],
   },
+  {
+    id: 'opera',
+    level: 'medium',
+    title: 'Оперная партия, Морфи, 1858',
+    fen: '4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16',
+    moves: ['b3b8', 'd7b8', 'd1d8'],
+  },
 
   // Hard: mate in 3
   { id: 'h1', level: 'hard', fen: 'r5k1/5Npp/8/8/2Q5/8/8/6K1 w - - 0 1', moves: ['f7h6', 'g8h8', 'c4g8', 'a8g8', 'h6f7'] },
