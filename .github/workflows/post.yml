@@ -1,0 +1,90 @@
+# Publishes a post to the Telegram channel with an inline "solve" button.
+# Run it from GitHub: Actions -> "Post to Telegram channel" -> Run workflow.
+#
+# Needs two repository secrets (Settings -> Secrets and variables -> Actions):
+#   TELEGRAM_BOT_TOKEN  - token of @chesskage_bot (from @BotFather)
+#   TELEGRAM_CHANNEL    - channel username, e.g. @my_channel
+#
+# Each post lives in its own folder: posts/<name>/
+#   text.txt  - post text (HTML allowed: <b>bold</b>, <i>italic</i>, <a href="...">link</a>)
+#   photo.jpg - optional picture (photo.png also works)
+# <name> must match the puzzle id in src/puzzles.js (e.g. "opera"),
+# so the button opens exactly that puzzle.
+
+name: Post to Telegram channel
+
+on:
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Папка поста в posts/ (= id задачи, например opera)'
+        required: true
+      button:
+        description: 'Текст кнопки'
+        required: true
+        default: '▶️ Решить задачу'
+
+env:
+  BOT_USERNAME: chesskage_bot
+  APP_NAME: puzzles
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Send post
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          POST: ${{ inputs.post }}
+          BUTTON: ${{ inputs.button }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$TOKEN" ] || [ -z "$CHANNEL" ]; then
+            echo "::error::Добавь секреты TELEGRAM_BOT_TOKEN и TELEGRAM_CHANNEL"
+            exit 1
+          fi
+          if ! [[ "$POST" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "::error::Название папки: только латиница, цифры, - и _"
+            exit 1
+          fi
+
+          DIR="posts/$POST"
+          if [ ! -f "$DIR/text.txt" ]; then
+            echo "::error::Не найден файл $DIR/text.txt"
+            exit 1
+          fi
+
+          URL="https://t.me/$BOT_USERNAME/$APP_NAME?startapp=$POST"
+          KEYBOARD=$(jq -nc --arg t "$BUTTON" --arg u "$URL" '{inline_keyboard: [[{text: $t, url: $u}]]}')
+          PHOTO=$(ls "$DIR"/photo.* 2>/dev/null | head -1 || true)
+          API="https://api.telegram.org/bot$TOKEN"
+
+          if [ -n "$PHOTO" ]; then
+            LEN=$(wc -m < "$DIR/text.txt")
+            if [ "$LEN" -gt 1024 ]; then
+              echo "::error::Текст с картинкой должен быть не длиннее 1024 символов (сейчас $LEN)"
+              exit 1
+            fi
+            RESPONSE=$(curl -sS "$API/sendPhoto" \
+              --form-string "chat_id=$CHANNEL" \
+              -F "photo=@$PHOTO" \
+              -F "caption=<$DIR/text.txt" \
+              --form-string "parse_mode=HTML" \
+              --form-string "reply_markup=$KEYBOARD")
+          else
+            RESPONSE=$(curl -sS "$API/sendMessage" \
+              --form-string "chat_id=$CHANNEL" \
+              -F "text=<$DIR/text.txt" \
+              --form-string "parse_mode=HTML" \
+              --form-string "reply_markup=$KEYBOARD")
+          fi
+
+          if [ "$(echo "$RESPONSE" | jq -r '.ok')" != "true" ]; then
+            echo "::error::Telegram ответил ошибкой: $(echo "$RESPONSE" | jq -r '.description')"
+            exit 1
+          fi
+          echo "Пост опубликован, кнопка ведёт на $URL"
