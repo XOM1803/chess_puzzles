@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import { LEVELS, PUZZLES } from './puzzles.js'
-import { initTelegram, haptic, loadProgress, saveProgress } from './telegram.js'
+import { initTelegram, haptic, loadProgress, saveProgress, getStartParam } from './telegram.js'
 import './App.css'
 
 const OPPONENT_DELAY = 500
@@ -35,11 +35,20 @@ function yesterday() {
 
 const EMPTY_PROGRESS = { solved: [], streak: 0, lastDay: null }
 
+// If the app was opened from a channel post link, start on that puzzle
+function startPuzzle() {
+  const id = getStartParam()
+  const puzzle = PUZZLES.find((p) => p.id === id) || PUZZLES[0]
+  const index = PUZZLES.filter((p) => p.level === puzzle.level).indexOf(puzzle)
+  return { levelId: puzzle.level, index, fen: puzzle.fen }
+}
+const START = startPuzzle()
+
 function App() {
   const [progress, setProgress] = useState(EMPTY_PROGRESS)
-  const [levelId, setLevelId] = useState('easy')
-  const [index, setIndex] = useState(0)
-  const [fen, setFen] = useState(PUZZLES[0].fen)
+  const [levelId, setLevelId] = useState(START.levelId)
+  const [index, setIndex] = useState(START.index)
+  const [fen, setFen] = useState(START.fen)
   const [step, setStep] = useState(0)
   const [status, setStatus] = useState('play') // play | wait | solved
   const [marks, setMarks] = useState({}) // square -> color
@@ -216,6 +225,7 @@ function App() {
         <div className="task-number">
           Задача {index + 1} из {levelPuzzles.length} {isSolved && '✓'}
         </div>
+        {puzzle.title && <div className="task-title">{puzzle.title}</div>}
         <div className="task-goal">
           {sideName} ставят мат в {level.mateIn} {movesWord(level.mateIn)}
         </div>

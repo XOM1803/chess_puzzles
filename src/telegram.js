@@ -14,6 +14,19 @@ export function initTelegram() {
   }
 }
 
+// Puzzle id from the link t.me/<bot>/<app>?startapp=<id>
+// (in a normal browser: ?startapp=<id> in the page address, for testing)
+export function getStartParam() {
+  try {
+    const fromTelegram = tg?.initDataUnsafe?.start_param
+    if (fromTelegram) return fromTelegram
+    const params = new URLSearchParams(window.location.search)
+    return params.get('startapp') || params.get('tgWebAppStartParam')
+  } catch {
+    return null
+  }
+}
+
 export function haptic(type) {
   try {
     if (type === 'select') tg?.HapticFeedback?.selectionChanged()

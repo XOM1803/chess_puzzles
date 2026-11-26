@@ -35,6 +35,14 @@ export const PUZZLES = [
   { id: 'm8', level: 'medium', fen: '7k/8/8/6K1/8/8/8/1Q6 w - - 0 1', moves: ['g5g6', 'h8g8', 'b1b8'] },
   { id: 'm9', level: 'medium', fen: '5k2/8/4K3/8/8/8/8/7R w - - 0 1', moves: ['h1g1', 'f8e8', 'g1g8'] },
   { id: 'm10', level: 'medium', fen: '2k5/8/1K6/8/8/8/8/7R w - - 0 1', moves: ['h1d1', 'c8b8', 'd1d8'] },
+  // Channel posts (open directly with ?startapp=<id>)
+  {
+    id: 'immortal',
+    level: 'medium',
+    title: 'Бессмертная партия, Андерсен, 1851',
+    fen: 'r1bk2nr/p2p1pNp/n2B4/1p1NP2P/6P1/3P1Q2/P1P1K3/q5b1 w - - 1 22',
+    moves: ['f3f6', 'g8f6', 'd6e7'],
+  },
 
   // Hard: mate in 3
   { id: 'h1', level: 'hard', fen: 'r5k1/5Npp/8/8/2Q5/8/8/6K1 w - - 0 1', moves: ['f7h6', 'g8h8', 'c4g8', 'a8g8', 'h6f7'] },

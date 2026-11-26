@@ -20,3 +20,8 @@
 npm install
 npm run dev
 ```
+
+## Задача из поста в канале
+
+1. Добавить задачу в `src/puzzles.js` со своим `id` (латиницей), например `immortal`.
+2. Ссылка для поста: `https://t.me/chesskage_bot/<short name приложения>?startapp=immortal`
