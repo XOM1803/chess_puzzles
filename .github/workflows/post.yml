@@ -1,15 +1,16 @@
 # Publishes a post to the Telegram channel with an inline "solve" button.
-# Run it from GitHub: Actions -> "Post to Telegram channel" -> Run workflow.
 #
-# Needs two repository secrets (Settings -> Secrets and variables -> Actions):
-#   TELEGRAM_BOT_TOKEN  - token of @chesskage_bot (from @BotFather)
+# Two ways to start it:
+#   1. Manually: Actions -> "Post to Telegram channel" -> Run workflow -> folder name.
+#   2. Automatically: add an empty file posts/<name>/publish and push it.
+#      (To publish the same post again: delete the file, then add it again.)
+#
+# Needs repository secrets (Settings -> Secrets and variables -> Actions):
+#   TELEGRAM_BOT_TOKEN  - token of @chesskage_bot
 #   TELEGRAM_CHANNEL    - channel username, e.g. @my_channel
 #
-# Each post lives in its own folder: posts/<name>/
-#   text.txt  - post text (HTML allowed: <b>bold</b>, <i>italic</i>, <a href="...">link</a>)
-#   photo.jpg - optional picture (photo.png also works)
-# <name> must match the puzzle id in src/puzzles.js (e.g. "opera"),
-# so the button opens exactly that puzzle.
+# Each post lives in posts/<name>/ : text.txt (HTML allowed) + optional photo.jpg.
+# <name> must match the puzzle id in src/puzzles.js, so the button opens that puzzle.
 
 name: Post to Telegram channel
 
@@ -23,6 +24,10 @@ on:
         description: 'Текст кнопки'
         required: true
         default: '▶️ Решить задачу'
+  push:
+    branches: [main]
+    paths:
+      - 'posts/*/publish'
 
 env:
   BOT_USERNAME: chesskage_bot
@@ -33,58 +38,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Send post
         env:
           TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
-          POST: ${{ inputs.post }}
-          BUTTON: ${{ inputs.button }}
+          EVENT: ${{ github.event_name }}
+          INPUT_POST: ${{ inputs.post }}
+          INPUT_BUTTON: ${{ inputs.button }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
         run: |
           set -euo pipefail
-
-          if [ -z "$TOKEN" ] || [ -z "$CHANNEL" ]; then
-            echo "::error::Добавь секреты TELEGRAM_BOT_TOKEN и TELEGRAM_CHANNEL"
-            exit 1
-          fi
-          if ! [[ "$POST" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "::error::Название папки: только латиница, цифры, - и _"
-            exit 1
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            scripts/post.sh "$INPUT_POST" "$INPUT_BUTTON"
+            exit 0
           fi
 
-          DIR="posts/$POST"
-          if [ ! -f "$DIR/text.txt" ]; then
-            echo "::error::Не найден файл $DIR/text.txt"
-            exit 1
+          # Push: publish every folder whose "publish" file was newly added
+          POSTS=$(git diff --name-only --diff-filter=A "$BEFORE" "$AFTER" -- 'posts/*/publish' | cut -d/ -f2 || true)
+          if [ -z "$POSTS" ]; then
+            echo "Новых флажков publish нет — ничего не публикую"
+            exit 0
           fi
-
-          URL="https://t.me/$BOT_USERNAME/$APP_NAME?startapp=$POST"
-          KEYBOARD=$(jq -nc --arg t "$BUTTON" --arg u "$URL" '{inline_keyboard: [[{text: $t, url: $u}]]}')
-          PHOTO=$(ls "$DIR"/photo.* 2>/dev/null | head -1 || true)
-          API="https://api.telegram.org/bot$TOKEN"
-
-          if [ -n "$PHOTO" ]; then
-            LEN=$(wc -m < "$DIR/text.txt")
-            if [ "$LEN" -gt 1024 ]; then
-              echo "::error::Текст с картинкой должен быть не длиннее 1024 символов (сейчас $LEN)"
-              exit 1
-            fi
-            RESPONSE=$(curl -sS "$API/sendPhoto" \
-              --form-string "chat_id=$CHANNEL" \
-              -F "photo=@$PHOTO" \
-              -F "caption=<$DIR/text.txt" \
-              --form-string "parse_mode=HTML" \
-              --form-string "reply_markup=$KEYBOARD")
-          else
-            RESPONSE=$(curl -sS "$API/sendMessage" \
-              --form-string "chat_id=$CHANNEL" \
-              -F "text=<$DIR/text.txt" \
-              --form-string "parse_mode=HTML" \
-              --form-string "reply_markup=$KEYBOARD")
-          fi
-
-          if [ "$(echo "$RESPONSE" | jq -r '.ok')" != "true" ]; then
-            echo "::error::Telegram ответил ошибкой: $(echo "$RESPONSE" | jq -r '.description')"
-            exit 1
-          fi
-          echo "Пост опубликован, кнопка ведёт на $URL"
+          for P in $POSTS; do
+            scripts/post.sh "$P"
+          done

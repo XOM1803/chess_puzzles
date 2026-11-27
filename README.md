@@ -29,6 +29,7 @@ npm run dev
 ## Публикация поста с кнопкой в канал
 
 1. Создать папку `posts/<id задачи>/` с файлами `text.txt` (текст поста, можно `<b>жирный</b>`) и `photo.jpg`.
-2. Actions → «Post to Telegram channel» → Run workflow → ввести id задачи.
+2. Опубликовать: Actions → «Post to Telegram channel» → Run workflow → ввести id задачи.
+   Или добавить пустой файл `posts/<id>/publish` — пост уйдёт в канал автоматически.
 
 Один раз нужно добавить секреты `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHANNEL` (Settings → Secrets and variables → Actions) и сделать бота администратором канала.
