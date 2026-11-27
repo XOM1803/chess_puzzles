@@ -132,7 +132,10 @@ function PuzzleView({ puzzle, label, solved, onSolved, onNext }) {
     for (const m of new Chess(fen).moves({ square: selected, verbose: true })) {
       squareStyles[m.to] = {
         ...squareStyles[m.to],
-        backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.25) 22%, transparent 24%)',
+        // dot for an empty square, ring for a capture
+        backgroundImage: m.captured
+          ? 'radial-gradient(circle, transparent 62%, rgba(0,0,0,0.3) 64%)'
+          : 'radial-gradient(circle, rgba(0,0,0,0.25) 22%, transparent 24%)',
       }
     }
   }
