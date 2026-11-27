@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { LEVELS, PUZZLES, TRAPS } from './puzzles.js'
 import { initTelegram, haptic, loadProgress, saveProgress, getStartParam } from './telegram.js'
 import PuzzleView from './PuzzleView.jsx'
+import PlayView from './PlayView.jsx'
 import './App.css'
 
 const EMPTY_PROGRESS = { solved: [], streak: 0, lastDay: null }
@@ -142,13 +143,7 @@ function App() {
           />
         )}
 
-        {tab === 'play' && (
-          <div className="soon">
-            <div className="soon-icon">♟️</div>
-            <div className="soon-title">Скоро</div>
-            <div className="soon-text">Здесь можно будет сыграть с компьютером или пригласить друга по ссылке.</div>
-          </div>
-        )}
+        {tab === 'play' && <PlayView />}
       </main>
 
       <nav className="tabbar">
