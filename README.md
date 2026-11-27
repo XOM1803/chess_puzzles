@@ -33,3 +33,8 @@ npm run dev
    Или добавить пустой файл `posts/<id>/publish` — пост уйдёт в канал автоматически.
 
 Один раз нужно добавить секреты `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHANNEL` (Settings → Secrets and variables → Actions) и сделать бота администратором канала.
+
+## Instagram (@chesskage_com, на английском)
+
+Пост: папка `instagram/<name>/` с `photo.jpg` и `caption.txt`. Публикация — пустой файл `instagram/<name>/publish`
+или Actions → «Post to Instagram» → Run workflow. Нужен секрет `INSTAGRAM_TOKEN`.

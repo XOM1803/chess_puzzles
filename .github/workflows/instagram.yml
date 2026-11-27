@@ -1,0 +1,74 @@
+# Publishes a post to Instagram.
+#   Automatically: add an empty file instagram/<name>/publish and push it.
+#   Manually: Actions -> "Post to Instagram" -> Run workflow -> folder name.
+# Each post: instagram/<name>/photo.jpg (JPG, best 1080x1080 or 1080x1350) + caption.txt
+# Needs repository secret INSTAGRAM_TOKEN (Instagram API with Instagram Login, from the Meta App Dashboard).
+# Once a month the token is refreshed so it doesn't expire (it lives 60 days).
+
+name: Post to Instagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Папка поста в instagram/'
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'instagram/*/publish'
+  schedule:
+    - cron: '17 6 1 * *' # 1st day of every month: refresh the token
+
+jobs:
+  post:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Publish
+        env:
+          IG_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          EVENT: ${{ github.event_name }}
+          INPUT_POST: ${{ inputs.post }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            scripts/instagram.sh "$INPUT_POST"
+            exit 0
+          fi
+          POSTS=$(git diff --name-only --diff-filter=A "$BEFORE" "$SHA" -- 'instagram/*/publish' | cut -d/ -f2 || true)
+          if [ -z "$POSTS" ]; then
+            echo "Новых флажков publish нет — ничего не публикую"
+            exit 0
+          fi
+          for P in $POSTS; do
+            scripts/instagram.sh "$P"
+          done
+
+  refresh-token:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh Instagram token
+        env:
+          IG_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+        run: |
+          set -euo pipefail
+          RESPONSE=$(curl -sS -G "https://graph.instagram.com/refresh_access_token" \
+            --data-urlencode "grant_type=ig_refresh_token" \
+            --data-urlencode "access_token=$IG_TOKEN")
+          if [ "$(echo "$RESPONSE" | jq -r 'has("error")')" = "true" ]; then
+            echo "::error::Не удалось продлить токен Instagram: $(echo "$RESPONSE" | jq -r '.error.message'). Создай новый токен и обнови секрет INSTAGRAM_TOKEN."
+            exit 1
+          fi
+          if [ "$(echo "$RESPONSE" | jq -r '.access_token')" != "$IG_TOKEN" ]; then
+            echo "::error::Instagram выдал новый токен — обнови секрет INSTAGRAM_TOKEN (создай токен заново в Meta App Dashboard)."
+            exit 1
+          fi
+          echo "Токен продлён ещё на $(( $(echo "$RESPONSE" | jq -r '.expires_in') / 86400 )) дней"
