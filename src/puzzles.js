@@ -54,3 +54,50 @@ export const PUZZLES = [
   // Hard: mate in 3
   { id: 'h1', level: 'hard', fen: 'r5k1/5Npp/8/8/2Q5/8/8/6K1 w - - 0 1', moves: ['f7h6', 'g8h8', 'c4g8', 'a8g8', 'h6f7'] },
 ]
+
+// Opening traps. `goal` is shown above the board, `explanation` after solving.
+// mate: false -> the final move must match exactly (e.g. winning the queen).
+export const TRAPS = [
+  {
+    id: 'legal',
+    title: 'Мат Легаля',
+    goal: 'Белые: пожертвуй ферзя и поставь мат',
+    fen: 'rn1qkbnr/ppp2p1p/3p2p1/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5',
+    moves: ['f3e5', 'g4d1', 'c4f7', 'e8e7', 'c3d5'],
+    mate: true,
+    explanation:
+      'Чёрные связали коня слоном g4 и думали, что конь не сдвинется. Но Кxe5! — и если чёрные жадно берут ферзя, лёгкие фигуры белых ставят мат: Сxf7+ Крe7, Кd5#.',
+  },
+  {
+    id: 'petrov',
+    title: 'Ловушка в защите Петрова',
+    goal: 'Белые: выиграй ферзя',
+    fen: 'rnbqkb1r/pppp1ppp/5n2/4N3/8/8/PPPPQPPP/RNB1KB1R w KQkq - 2 5',
+    moves: ['e5c6', 'f8e7', 'c6d8'],
+    mate: false,
+    explanation:
+      'Король и ферзь белых стоят на одной линии e. Конь уходит с шахом (вскрытый шах ферзём e2) и одновременно нападает на ферзя d8. Чёрные защищаются от шаха — и теряют ферзя.',
+  },
+  {
+    id: 'englund',
+    title: 'Гамбит Энглунда',
+    goal: 'Чёрные: поставь мат',
+    fen: 'r1b1kbnr/pppp1ppp/2n5/4P3/8/2B2N2/PqP1PPPP/RN1QKB1R b KQkq - 1 6',
+    moves: ['f8b4', 'd1d2', 'b4c3', 'd2c3', 'b2c1'],
+    mate: true,
+    explanation:
+      'Белые увели слона на c3, чтобы поймать ферзя. Но Сb4! связывает слона, а после разменов на c3 ферзь чёрных ставит мат на c1 — король белых не успел рокироваться.',
+  },
+  {
+    id: 'blackburne',
+    title: 'Ловушка Блэкберна',
+    goal: 'Чёрные: поставь мат',
+    fen: 'r1b1kbnr/pppp1Npp/8/6q1/2BnP3/8/PPPP1PPP/RNBQK2R b KQkq - 0 5',
+    moves: ['g5g2', 'h1f1', 'g2e4', 'c4e2', 'd4f3'],
+    mate: true,
+    explanation:
+      'Белые съели пешку f7 и напали на ладью h8, но забыли о своём короле. Фxg2, затем Фxe4+, и конь ставит мат на f3 — король зажат своими же фигурами.',
+  },
+]
+
+export const ALL_PUZZLES = [...PUZZLES, ...TRAPS]
