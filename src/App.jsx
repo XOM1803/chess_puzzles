@@ -105,12 +105,14 @@ function App() {
         <>
           <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />
           <div className="menu">
-            {LEVELS.map((l) => {
+            {LEVELS.map((l, i) => {
               const list = PUZZLES.filter((p) => p.level === l.id)
               const done = list.filter((p) => progress.solved.includes(p.id)).length
+              const firstTheme = l.theme && !LEVELS[i - 1]?.theme
               return (
                 <button
                   key={l.id}
+                  style={firstTheme ? { marginTop: 10, borderTop: '1px solid rgba(128,128,128,0.25)', borderRadius: 0 } : undefined}
                   className={'menu-item' + (l.id === levelId ? ' active' : '')}
                   onClick={() => chooseLevel(l.id)}
                 >
