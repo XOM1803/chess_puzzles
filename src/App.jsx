@@ -16,6 +16,9 @@ function dayString(offset = 0) {
 // If the app was opened from a channel post link (?startapp=<id>), start on that puzzle
 function startState() {
   const id = getStartParam()
+  if (id && id.startsWith('game_')) {
+    return { tab: 'play', levelId: 'easy', taskIndex: 0, trapIndex: 0, joinId: id.slice(5) }
+  }
   const trapIndex = TRAPS.findIndex((t) => t.id === id)
   if (trapIndex !== -1) return { tab: 'traps', levelId: 'easy', taskIndex: 0, trapIndex }
   const puzzle = PUZZLES.find((p) => p.id === id) || PUZZLES[0]
@@ -143,7 +146,7 @@ function App() {
           />
         )}
 
-        {tab === 'play' && <PlayView />}
+        {tab === 'play' && <PlayView joinId={START.joinId || null} />}
       </main>
 
       <nav className="tabbar">

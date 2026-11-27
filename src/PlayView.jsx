@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Chess } from 'chess.js'
 import GameBoard, { gameResult } from './GameBoard.jsx'
 import { ENGINE_LEVELS, getBestMove, preloadEngine } from './engine.js'
 import { haptic } from './telegram.js'
+// loaded only when needed (it includes Firebase)
+const FriendGame = lazy(() => import('./FriendGame.jsx'))
 
 const SAVE_KEY = 'vs_computer_v1'
 
@@ -30,9 +32,10 @@ function replay(moves) {
   return game
 }
 
-function PlayView() {
+// props: joinId - online game id from an invite link (opens the friend game)
+function PlayView({ joinId }) {
   const saved = loadSaved()
-  const [screen, setScreen] = useState(saved ? 'game' : 'menu') // menu | setup | game | friend
+  const [screen, setScreen] = useState(joinId ? 'friend' : saved ? 'game' : 'menu') // menu | setup | game | friend
   const [level, setLevel] = useState(saved?.level || 'amateur')
   const [colorChoice, setColorChoice] = useState('w') // w | b | random
   const [myColor, setMyColor] = useState(saved?.color || 'w')
@@ -139,14 +142,9 @@ function PlayView() {
 
   if (screen === 'friend') {
     return (
-      <div className="soon">
-        <div className="soon-icon">👥</div>
-        <div className="soon-title">Скоро</div>
-        <div className="soon-text">Игра с другом по ссылке появится совсем скоро.</div>
-        <button className="secondary back-button" onClick={() => setScreen('menu')}>
-          ← Назад
-        </button>
-      </div>
+      <Suspense fallback={<div className="soon"><div className="soon-text">Загрузка…</div></div>}>
+        <FriendGame joinId={joinId} onBack={() => setScreen('menu')} />
+      </Suspense>
     )
   }
 

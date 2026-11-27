@@ -349,3 +349,40 @@
   border-radius: 12px;
   font-size: 16px;
 }
+
+.setup-hint {
+  padding: 0 16px;
+  color: var(--hint);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.invite-link {
+  margin: 16px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--card);
+  font-size: 13px;
+  word-break: break-all;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.soon .buttons {
+  padding: 0;
+}
+
+.link-button {
+  margin-top: 16px;
+  border: none;
+  background: transparent;
+  color: var(--hint);
+  font-size: 15px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.danger {
+  background: #e53935;
+  color: #fff;
+}

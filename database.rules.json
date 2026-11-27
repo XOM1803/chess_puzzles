@@ -1,0 +1,23 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "games": {
+      "$gameId": {
+        ".read": "$gameId.length >= 6 && $gameId.length <= 12",
+        ".write": "$gameId.length >= 6 && $gameId.length <= 12 && newData.exists()",
+        ".validate": "newData.hasChildren(['createdAt', 'status', 'moves'])",
+        "createdAt": { ".validate": "newData.isNumber() && (!data.exists() || newData.val() == data.val())" },
+        "updatedAt": { ".validate": "newData.isNumber()" },
+        "status": { ".validate": "newData.val() == 'waiting' || newData.val() == 'playing' || newData.val() == 'over'" },
+        "moves": { ".validate": "newData.isString() && newData.val().length <= 3000 && (!data.exists() || newData.val().beginsWith(data.val()))" },
+        "white": { ".validate": "newData.isString() && newData.val().length <= 40 && (!data.exists() || newData.val() == data.val())" },
+        "black": { ".validate": "newData.isString() && newData.val().length <= 40 && (!data.exists() || newData.val() == data.val())" },
+        "whiteName": { ".validate": "newData.isString() && newData.val().length <= 64" },
+        "blackName": { ".validate": "newData.isString() && newData.val().length <= 64" },
+        "result": { ".validate": "newData.isString() && newData.val().length <= 30" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
