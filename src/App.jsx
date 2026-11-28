@@ -3,6 +3,7 @@ import { LEVELS, PUZZLES, TRAPS } from './puzzles.js'
 import { initTelegram, haptic, loadProgress, saveProgress, getStartParam } from './telegram.js'
 import PuzzleView from './PuzzleView.jsx'
 import PlayView from './PlayView.jsx'
+import Icon from './Icon.jsx'
 import './App.css'
 
 const EMPTY_PROGRESS = { solved: [], streak: 0, lastDay: null }
@@ -96,8 +97,8 @@ function App() {
           <div className="topbar-title">{tab === 'traps' ? 'Ловушки' : 'Играть'}</div>
         )}
         <div className="stats">
-          <span>✓ {progress.solved.length}</span>
-          <span>🔥 {streakNow}</span>
+          <span className="stat"><Icon name="trophy" /> {progress.solved.length}</span>
+          <span className="stat"><Icon name="streak" /> {streakNow}</span>
         </div>
       </div>
 
@@ -153,12 +154,12 @@ function App() {
 
       <nav className="tabbar">
         {[
-          { id: 'tasks', icon: '🧩', title: 'Задачи' },
-          { id: 'traps', icon: '🪤', title: 'Ловушки' },
-          { id: 'play', icon: '♟️', title: 'Играть' },
+          { id: 'tasks', icon: 'puzzle', title: 'Задачи' },
+          { id: 'traps', icon: 'target', title: 'Ловушки' },
+          { id: 'play', icon: 'pawn', title: 'Играть' },
         ].map((t) => (
           <button key={t.id} className={'tab' + (tab === t.id ? ' active' : '')} onClick={() => openTab(t.id)}>
-            <span className="tab-icon">{t.icon}</span>
+            <Icon name={t.icon} className="tab-icon" />
             <span>{t.title}</span>
           </button>
         ))}

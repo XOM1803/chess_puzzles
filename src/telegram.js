@@ -8,6 +8,10 @@ export function initTelegram() {
   try {
     tg.ready()
     tg.expand()
+    // light/dark mark for CSS (icons). Telegram's theme may differ from the phone's.
+    const setScheme = () => (document.documentElement.dataset.theme = tg.colorScheme || '')
+    setScheme()
+    tg.onEvent?.('themeChanged', setScheme)
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes() // so dragging a piece doesn't close the app
   } catch (e) {
     console.warn('Telegram init failed', e)

@@ -3,6 +3,7 @@ import { Chess } from 'chess.js'
 import GameBoard from './GameBoard.jsx'
 import { createGame, joinGame, watchGame, sendMove, finishGame, playerId, inviteLink } from './online.js'
 import { haptic } from './telegram.js'
+import Icon from './Icon.jsx'
 
 const SAVE_KEY = 'online_game_v1'
 
@@ -187,7 +188,7 @@ function FriendGame({ joinId, onBack }) {
   if (error || game === undefined || game === null) {
     return (
       <div className="soon">
-        <div className="soon-icon">{error || game === null ? '😕' : '⏳'}</div>
+        <div className="soon-icon">{error || game === null ? '😕' : <Icon name="history" />}</div>
         <div className="soon-text">
           {error || (game === null ? 'Игра не найдена. Возможно, ссылка неверная.' : 'Загружаю игру…')}
         </div>
@@ -221,7 +222,7 @@ function FriendGame({ joinId, onBack }) {
     const link = inviteLink(gameId)
     return (
       <div className="soon">
-        <div className="soon-icon">⏳</div>
+        <div className="soon-icon"><Icon name="history" /></div>
         <div className="soon-title">Ждём соперника</div>
         <div className="soon-text">Отправь другу ссылку. Игра начнётся сама, когда он её откроет.</div>
         <div className="invite-link">{link}</div>
@@ -233,10 +234,10 @@ function FriendGame({ joinId, onBack }) {
               setCopied(true)
             }}
           >
-            {copied ? '✓ Скопировано' : '📋 Копировать'}
+            {copied ? '✓ Скопировано' : <><Icon name="document" /> Копировать</>}
           </button>
           <button className="primary" onClick={() => share(gameId)}>
-            📤 Отправить
+            <Icon name="share" /> Отправить
           </button>
         </div>
         <button className="link-button" onClick={leave}>
@@ -294,7 +295,7 @@ function FriendGame({ joinId, onBack }) {
   return (
     <>
       <div className="task">
-        <div className="task-number">👥 против {opponentName}</div>
+        <div className="task-number"><Icon name="users" /> против {opponentName}</div>
         <div className={'task-goal' + (over ? ' result' : '')}>
           {over ? resultText(game.result, myColor) : status}
         </div>
@@ -315,7 +316,7 @@ function FriendGame({ joinId, onBack }) {
           </button>
         ) : (
           <button className={confirmResign ? 'danger' : 'secondary'} onClick={resign}>
-            {confirmResign ? 'Точно сдаться?' : '🏳️ Сдаться'}
+            {confirmResign ? 'Точно сдаться?' : <><Icon name="flag" /> Сдаться</>}
           </button>
         )}
       </div>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import { haptic } from './telegram.js'
+import Icon from './Icon.jsx'
 
 const OPPONENT_DELAY = 500
 const WRONG_DELAY = 700
@@ -186,7 +187,7 @@ function PuzzleView({ puzzle, label, solved, onSolved, onNext }) {
         ) : (
           <>
             <button className="secondary" onClick={showHint} disabled={status !== 'play'}>
-              💡 Подсказка
+              <Icon name="hint" /> Подсказка
             </button>
             <button className="secondary" onClick={onNext}>
               Следующая →

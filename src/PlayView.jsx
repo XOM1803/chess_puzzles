@@ -3,6 +3,7 @@ import { Chess } from 'chess.js'
 import GameBoard, { gameResult } from './GameBoard.jsx'
 import { ENGINE_LEVELS, getBestMove, preloadEngine } from './engine.js'
 import { haptic } from './telegram.js'
+import Icon from './Icon.jsx'
 // loaded only when needed (it includes Firebase)
 const FriendGame = lazy(() => import('./FriendGame.jsx'))
 
@@ -121,7 +122,7 @@ function PlayView({ joinId }) {
     return (
       <div className="play-menu">
         <button className="play-card" onClick={() => setScreen('setup')}>
-          <span className="play-card-icon">🤖</span>
+          <Icon name="bot-engine" className="play-card-icon" />
           <span>
             <b>С компьютером</b>
             <br />
@@ -129,7 +130,7 @@ function PlayView({ joinId }) {
           </span>
         </button>
         <button className="play-card" onClick={() => setScreen('friend')}>
-          <span className="play-card-icon">👥</span>
+          <Icon name="users" className="play-card-icon" />
           <span>
             <b>С другом</b>
             <br />
@@ -203,7 +204,7 @@ function PlayView({ joinId }) {
   return (
     <>
       <div className="task">
-        <div className="task-number">🤖 Компьютер · {levelTitle}</div>
+        <div className="task-number"><Icon name="bot-engine" /> Компьютер · {levelTitle}</div>
         <div className={'task-goal' + (result ? ' result' : '')}>{result || status}</div>
       </div>
 
@@ -218,7 +219,7 @@ function PlayView({ joinId }) {
       <div className="buttons">
         {!result && (
           <button className="secondary" onClick={undo} disabled={moves.length === 0}>
-            ↩️ Отменить ход
+            <Icon name="undo" /> Отменить ход
           </button>
         )}
         <button className={result ? 'primary' : 'secondary'} onClick={newGame}>
