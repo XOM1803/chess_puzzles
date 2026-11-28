@@ -386,3 +386,52 @@
   background: #e53935;
   color: #fff;
 }
+
+/* SVG icons (src/icons, see Icon.jsx). Dark-blue parts follow --icon-ink. */
+.app {
+  --icon-ink: #062c66;
+}
+@media (prefers-color-scheme: dark) {
+  .app {
+    --icon-ink: var(--text);
+  }
+}
+.icon {
+  display: inline-flex;
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.28em;
+  color: var(--icon-ink);
+  flex-shrink: 0;
+}
+.icon svg {
+  display: block;
+}
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tab-icon.icon {
+  width: 26px;
+  height: 26px;
+}
+.play-card-icon.icon {
+  width: 40px;
+  height: 40px;
+}
+.soon-icon .icon {
+  width: 56px;
+  height: 56px;
+}
+/* Inside Telegram its own light/dark setting wins over the phone's */
+html[data-theme='light'] .app {
+  --icon-ink: #062c66;
+}
+html[data-theme='dark'] .app {
+  --icon-ink: var(--text);
+}
+/* On a filled blue button icons are drawn in the button's text color */
+.primary .icon {
+  color: var(--button-text);
+}
